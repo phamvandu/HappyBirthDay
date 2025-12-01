@@ -56,7 +56,7 @@
             line-height: 1.5;
         }
 
-        .open-slide-btn, .music-button {
+        .open-slide-btn, .music-button, .love-message-btn {
             background: linear-gradient(90deg,#ff6aa6,#ff3b84);
             color: white;
             padding: 14px 25px;
@@ -64,7 +64,7 @@
             border-radius: 50px;
             border: none;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             margin: 8px 5px;
             display: inline-block;
             box-shadow: 0 6px 12px rgba(255, 80, 150, 0.4);
@@ -73,7 +73,7 @@
             font-weight: 600;
         }
         
-        .open-slide-btn:hover, .music-button:hover { 
+        .open-slide-btn:hover, .music-button:hover, .love-message-btn:hover { 
             transform: translateY(-2px); 
         }
 
@@ -84,7 +84,43 @@
             animation: pulseWave 1.2s infinite ease-in-out;
         }
 
-        .hidden-text { 
+        /* Nút lời chúc đặc biệt */
+        .love-message-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53) !important;
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .love-message-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 1%, transparent 20%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .love-message-btn:hover::after {
+            opacity: 1;
+        }
+
+        .love-message-btn.clicked {
+            background: linear-gradient(90deg, #36d1dc, #5b86e5) !important;
+            box-shadow: 0 0 20px rgba(91, 134, 229, 0.6);
+            transform: scale(1.05);
+            animation: lovePulse 2s infinite ease-in-out;
+        }
+
+        @keyframes lovePulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(91, 134, 229, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(91, 134, 229, 0.9); }
+        }
+
+        /* .hidden-text { 
             display: none; 
             margin-top: 20px; 
             font-size: 17px; 
@@ -95,6 +131,72 @@
             padding: 15px;
             background: #fff5f7;
             border-radius: 15px;
+        } */
+
+        /* Lời chúc đặc biệt */
+        .special-message {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff5f7, #ffeef1);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(255, 45, 112, 0.15);
+            animation: slideInUp 0.8s ease forwards;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #ff2d70;
+        }
+
+        .special-message::before {
+            content: '💌';
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            font-size: 40px;
+            opacity: 0.3;
+            transform: rotate(15deg);
+        }
+
+        .special-message::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23ff2d70" opacity="0.05" d="M20,50 Q50,20 80,50 Q50,80 20,50"/></svg>');
+            background-size: 60px;
+            z-index: 0;
+        }
+
+        .special-message-content {
+            position: relative;
+            z-index: 1;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .special-message-content p {
+            margin: 10px 0;
+        }
+
+        .special-message-content .heart-icon {
+            color: #ff2d70;
+            font-size: 20px;
+            margin: 0 5px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         /* Trái tim bay */
@@ -328,17 +430,25 @@
                 margin-bottom: 18px;
             }
             
-            .open-slide-btn, .music-button {
+            .open-slide-btn, .music-button, .love-message-btn {
                 padding: 14px 20px;
                 font-size: 15px;
                 min-width: 140px;
                 margin: 6px 4px;
             }
             
-            .hidden-text {
+             .special-message {
                 font-size: 16px;
                 padding: 12px;
                 margin-top: 18px;
+            }
+            
+            .special-message {
+                padding: 15px;
+            }
+            
+            .special-message-content {
+                font-size: 15px;
             }
             
             .lightbox-content {
@@ -399,10 +509,16 @@
                 font-size: 20px;
             }
             
-            .open-slide-btn, .music-button {
+            .open-slide-btn, .music-button, .love-message-btn {
                 padding: 12px 16px;
                 font-size: 14px;
                 min-width: 130px;
+                display: block;
+                margin: 8px auto;
+            }
+            
+            .special-message {
+                margin: 15px 5px;
             }
             
             .slide {
@@ -432,6 +548,11 @@
                 font-size: 18px;
             }
             
+            .open-slide-btn, .music-button, .love-message-btn {
+                margin: 10px;
+                min-width: 180px;
+            }
+            
             .slide {
                 width: 200px;
                 height: 220px;
@@ -447,11 +568,26 @@
                 max-width: 90%;
                 max-height: 90%;
             }
+            
+            .special-message {
+                max-width: 80%;
+                margin: 25px auto;
+            }
         }
 
         /* Ngăn chặn zoom trên mobile */
         input, select, textarea {
             font-size: 16px !important;
+        }
+
+        /* Animation cho nút */
+        @keyframes buttonBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .button-animation {
+            animation: buttonBounce 0.5s ease;
         }
     </style>
 </head>
@@ -470,13 +606,38 @@
         <button id="btn" class="open-slide-btn">Bấm vào đây nè 💗</button>
 
         <p class="hidden-text" id="hidden">
-            Anh yêu em rất nhiều!  
+            <!-- Anh yêu em rất nhiều!  
             Mong rằng em sẽ luôn hạnh phúc,<br>
-            và mỗi khoảnh khắc bên em đều là điều tuyệt vời nhất với anh. 💞
+            và mỗi khoảnh khắc bên em đều là điều tuyệt vời nhất với anh. 💞 -->
         </p>
 
         <!-- Nút nhạc -->
         <button id="musicBtn" class="music-button">Phát nhạc 🎵</button>
+        
+        <!-- Nút Lời chúc đến từ anh iu -->
+        <button id="loveMessageBtn" class="love-message-btn">Lời chúc đến từ anh iu 💌</button>
+        
+        <!-- Lời chúc đặc biệt -->
+        <div class="special-message" id="specialMessage">
+            <div class="special-message-content">
+                <p>Gửi đến em yêu của anh,</p>
+                <p>Hôm nay là ngày thật đặc biệt, ngày mà em chào đời và mang đến cho cuộc sống của anh những niềm vui vô bờ bến.</p>
+                <p>Anh muốn nói rằng: <strong>Em là món quà tuyệt vời nhất mà cuộc đời ban tặng cho anh</strong> <span class="heart-icon">❤️</span></p>
+                <p>Mỗi ngày bên em đều là một ngày hạnh phúc, mỗi nụ cười của em đều khiến trái tim anh rung động.</p>
+                <p>Chúc em tuổi mới:</p>
+                <p>💖 Luôn xinh đẹp và rạng rỡ<br>
+                   💖 Luôn mạnh khỏe và vui vẻ<br>
+                   💖 Thành công trong mọi ước mơ<br>
+                   💖 Và hãy luôn để anh được yêu thương, che chở cho em</p>
+                <p>Anh hứa sẽ luôn ở bên em, cùng em đi qua mọi chặng đường của cuộc sống. Dù có khó khăn nào, anh cũng sẽ là điểm tựa vững chắc cho em.</p>
+                <p>Yêu em nhiều lắm! <span class="heart-icon">💕</span></p>
+                <p style="text-align: right; font-style: italic; margin-top: 20px;">
+                    Từ anh iu của em<br>
+                    <span style="color: #ff2d70; font-weight: bold;">Mãi mãi yêu em 💘</span>
+                </p>
+            </div>
+        </div>
+
         <audio id="music">
             <source src="./sound/song.mp3" type="audio/mpeg">
         </audio>
@@ -519,7 +680,55 @@
 document.getElementById("btn").onclick = function() {
     document.getElementById("hidden").style.display = "block";
     openLightbox();
+    
+    // Thêm hiệu ứng cho nút
+    this.classList.add('button-animation');
+    setTimeout(() => this.classList.remove('button-animation'), 500);
 };
+
+// === Nút Lời chúc đến từ anh iu ===
+const loveMessageBtn = document.getElementById("loveMessageBtn");
+const specialMessage = document.getElementById("specialMessage");
+
+loveMessageBtn.onclick = function() {
+    // Hiển thị lời chúc đặc biệt
+    specialMessage.style.display = "block";
+    
+    // Thêm hiệu ứng cho nút
+    this.classList.add('clicked');
+    this.classList.add('button-animation');
+    
+    // Thêm nhiều trái tim bay hơn
+    for(let i = 0; i < 20; i++) {
+        setTimeout(() => createSpecialHeart(), i * 100);
+    }
+    
+    // Phát nhạc nếu chưa phát
+    if (!isPlaying) {
+        musicBtn.click();
+    }
+    
+    setTimeout(() => this.classList.remove('button-animation'), 500);
+    
+    // Cuộn đến lời chúc nếu cần
+    setTimeout(() => {
+        specialMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+};
+
+// Tạo trái tim đặc biệt cho nút lời chúc
+function createSpecialHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
+    heart.style.background = "#ff2d70";
+    heart.style.width = "20px";
+    heart.style.height = "20px";
+    
+    hearts.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+}
 
 // === Nhạc có hiệu ứng ===
 const musicBtn = document.getElementById("musicBtn");
@@ -547,6 +756,10 @@ musicBtn.onclick = function (e) {
         musicBtn.classList.remove("playing");
         musicBtn.textContent = "Phát nhạc 🎵";
     }
+    
+    // Thêm hiệu ứng
+    this.classList.add('button-animation');
+    setTimeout(() => this.classList.remove('button-animation'), 500);
 };
 
 // === Trái tim bay ===
@@ -669,6 +882,10 @@ pauseBtn.addEventListener('click', () => {
     } else {
         pauseBtn.textContent = 'Tạm dừng ⏸️';
     }
+    
+    // Thêm hiệu ứng
+    pauseBtn.classList.add('button-animation');
+    setTimeout(() => pauseBtn.classList.remove('button-animation'), 500);
 });
 
 // Xử lý nút tốc độ
@@ -681,6 +898,10 @@ speedBtn.addEventListener('click', () => {
     } else {
         setAnimationSpeed(1); // Bình thường
     }
+    
+    // Thêm hiệu ứng
+    speedBtn.classList.add('button-animation');
+    setTimeout(() => speedBtn.classList.remove('button-animation'), 500);
 });
 
 // Open lightbox
@@ -806,11 +1027,26 @@ const buttons = document.querySelectorAll('button');
 buttons.forEach(button => {
     button.addEventListener('touchstart', function() {
         this.style.opacity = '0.7';
+        this.style.transform = 'scale(0.98)';
     });
     
     button.addEventListener('touchend', function() {
         this.style.opacity = '1';
+        this.style.transform = 'scale(1)';
     });
+    
+    button.addEventListener('touchcancel', function() {
+        this.style.opacity = '1';
+        this.style.transform = 'scale(1)';
+    });
+});
+
+// Hiệu ứng khi trang load xong
+window.addEventListener('load', function() {
+    // Tạo một vài trái tim chào mừng
+    for(let i = 0; i < 15; i++) {
+        setTimeout(() => createHeart(), i * 200);
+    }
 });
 </script>
 
