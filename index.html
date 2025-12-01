@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday - Slide</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #ff8fb1, #ffd6e0);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            animation: fadeIn 1.2s ease;
+            box-sizing: border-box;
+            margin: 10px;
+        }
+
+        .title { 
+            color: #ff2d70; 
+            animation: popIn 1s ease; 
+            font-size: 24px;
+            margin: 0 0 15px 0;
+            line-height: 1.3;
+        }
+        
+        .message { 
+            font-size: 16px; 
+            color: #444; 
+            margin-bottom: 20px; 
+            animation: fadeIn 2s ease;
+            line-height: 1.5;
+        }
+
+        .open-slide-btn, .music-button {
+            background: linear-gradient(90deg,#ff6aa6,#ff3b84);
+            color: white;
+            padding: 14px 25px;
+            font-size: 16px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 8px 5px;
+            display: inline-block;
+            box-shadow: 0 6px 12px rgba(255, 80, 150, 0.4);
+            min-width: 160px;
+            touch-action: manipulation;
+            font-weight: 600;
+        }
+        
+        .open-slide-btn:hover, .music-button:hover { 
+            transform: translateY(-2px); 
+        }
+
+        .music-button.playing {
+            background: #4cd964 !important;
+            box-shadow: 0 0 15px rgba(76, 217, 100, 0.7);
+            transform: scale(1.05);
+            animation: pulseWave 1.2s infinite ease-in-out;
+        }
+
+        .hidden-text { 
+            display: none; 
+            margin-top: 20px; 
+            font-size: 17px; 
+            color: #ff2d70; 
+            font-weight: bold; 
+            animation: fadeIn 1.2s ease forwards; 
+            line-height: 1.5;
+            padding: 15px;
+            background: #fff5f7;
+            border-radius: 15px;
+        }
+
+        /* Trái tim bay */
+        #hearts-container .heart { 
+            position: fixed; 
+            width: 16px; 
+            height: 16px; 
+            background: pink; 
+            transform: rotate(45deg); 
+            animation: floatUp 4s linear; 
+            opacity: 0.9; 
+            z-index: 0;
+        }
+        
+        #hearts-container .heart::before, 
+        #hearts-container .heart::after { 
+            content: ""; 
+            position: absolute; 
+            width: 16px; 
+            height: 16px; 
+            background: pink; 
+            border-radius: 50%; 
+        }
+        
+        #hearts-container .heart::before { 
+            top: -8px; 
+            left: 0; 
+        }
+        
+        #hearts-container .heart::after { 
+            left: -8px; 
+            top: 0; 
+        }
+        
+        @keyframes floatUp { 
+            from { 
+                transform: translateY(100vh) rotate(45deg); 
+                opacity: 1; 
+            } 
+            to { 
+                transform: translateY(-10vh) rotate(45deg); 
+                opacity: 0; 
+            } 
+        }
+
+        /* Pháo hoa */
+        .firework {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Lightbox / Slideshow tự động --- */
+        .lightbox { 
+            position: fixed; 
+            inset: 0; 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 9999; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            overflow: hidden;
+        }
+        
+        .lightbox-content { 
+            position: relative; 
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            max-height: 100%;
+            background: rgba(255,255,255,0.05); 
+            border-radius: 0;
+            padding: 15px;
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .lightbox .close { 
+            position: absolute; 
+            right: 15px; 
+            top: 15px; 
+            background: rgba(0,0,0,0.5);
+            border: none; 
+            font-size: 32px; 
+            color: white; 
+            cursor: pointer; 
+            line-height: 1; 
+            z-index: 10;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Container cho slides tự động chạy */
+        .slides-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            height: 200px;
+            margin-top: 40px;
+        }
+
+        .slides-track {
+            display: flex;
+            gap: 12px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .slide {
+            flex: 0 0 auto;
+            width: 160px;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .slide:hover { 
+            transform: scale(1.05);
+            z-index: 2;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* Control buttons */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            min-width: 130px;
+            touch-action: manipulation;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.35);
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { 
+            from { 
+                opacity: 0; 
+                transform: translateY(15px); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            } 
+        }
+        
+        @keyframes popIn { 
+            0% { 
+                transform: scale(0.3); 
+                opacity: 0; 
+            } 
+            100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            } 
+        }
+        
+        @keyframes pulseWave { 
+            0% { 
+                box-shadow: 0 0 10px rgba(76, 217, 100, 0.6); 
+            } 
+            50% { 
+                box-shadow: 0 0 18px rgba(76, 217, 100, 1); 
+            } 
+            100% { 
+                box-shadow: 0 0 10px rgba(76, 217, 100, 0.6); 
+            } 
+        }
+
+        /* Responsive cho iPhone 6S và màn hình nhỏ */
+        @media (max-width: 375px) {
+            .card {
+                padding: 20px 15px;
+                margin: 5px;
+                border-radius: 15px;
+            }
+            
+            .title {
+                font-size: 22px;
+                margin-bottom: 12px;
+            }
+            
+            .message {
+                font-size: 15px;
+                margin-bottom: 18px;
+            }
+            
+            .open-slide-btn, .music-button {
+                padding: 14px 20px;
+                font-size: 15px;
+                min-width: 140px;
+                margin: 6px 4px;
+            }
+            
+            .hidden-text {
+                font-size: 16px;
+                padding: 12px;
+                margin-top: 18px;
+            }
+            
+            .lightbox-content {
+                padding: 10px;
+            }
+            
+            .lightbox .close {
+                right: 10px;
+                top: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
+            }
+            
+            .slides-container {
+                height: 180px;
+                margin-top: 30px;
+            }
+            
+            .slide {
+                width: 140px;
+                height: 160px;
+            }
+            
+            .control-btn {
+                padding: 11px 16px;
+                font-size: 14px;
+                min-width: 120px;
+            }
+            
+            #hearts-container .heart {
+                width: 14px;
+                height: 14px;
+            }
+            
+            #hearts-container .heart::before,
+            #hearts-container .heart::after {
+                width: 14px;
+                height: 14px;
+            }
+            
+            #hearts-container .heart::before {
+                top: -7px;
+            }
+            
+            #hearts-container .heart::after {
+                left: -7px;
+            }
+        }
+
+        /* Cho màn hình rất nhỏ (iPhone 5/SE) */
+        @media (max-width: 320px) {
+            .card {
+                padding: 18px 12px;
+            }
+            
+            .title {
+                font-size: 20px;
+            }
+            
+            .open-slide-btn, .music-button {
+                padding: 12px 16px;
+                font-size: 14px;
+                min-width: 130px;
+            }
+            
+            .slide {
+                width: 130px;
+                height: 150px;
+            }
+            
+            .control-btn {
+                min-width: 110px;
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+        }
+
+        /* Cho màn hình lớn hơn */
+        @media (min-width: 768px) {
+            .card {
+                padding: 30px 40px;
+                border-radius: 25px;
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .message {
+                font-size: 18px;
+            }
+            
+            .slide {
+                width: 200px;
+                height: 220px;
+            }
+            
+            .slides-container {
+                height: 240px;
+            }
+            
+            .lightbox-content {
+                padding: 25px;
+                border-radius: 15px;
+                max-width: 90%;
+                max-height: 90%;
+            }
+        }
+
+        /* Ngăn chặn zoom trên mobile */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1 class="title">🎂 Happy Birthday Em yêu 🎂</h1>
+
+        <p class="message">
+            Chúc em tuổi mới thật xinh đẹp, hạnh phúc và rạng rỡ hơn mỗi ngày.<br>
+            Cảm ơn em vì đã luôn ở bên anh. 💖
+        </p>
+
+        <!-- Nút mở slideshow -->
+        <button id="btn" class="open-slide-btn">Bấm vào đây nè 💗</button>
+
+        <p class="hidden-text" id="hidden">
+            Anh yêu em rất nhiều!  
+            Mong rằng em sẽ luôn hạnh phúc,<br>
+            và mỗi khoảnh khắc bên em đều là điều tuyệt vời nhất với anh. 💞
+        </p>
+
+        <!-- Nút nhạc -->
+        <button id="musicBtn" class="music-button">Phát nhạc 🎵</button>
+        <audio id="music">
+            <source src="./song.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+</div>
+
+<!-- Trái tim bay -->
+<div id="hearts-container"></div>
+
+<!-- SLIDESHOW TỰ ĐỘNG CHẠY -->
+<div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Slideshow ảnh">
+    <div class="lightbox-content">
+        <button class="close" id="closeLightbox" aria-label="Đóng">&times;</button>
+        
+        <div class="slides-container">
+            <div class="slides-track" id="slidesTrack">
+                <!-- Các ảnh sẽ được tự động clone thêm bằng JavaScript -->
+                <div class="slide"><img src="./1.jpg" alt="Ảnh 1"></div>
+                <div class="slide"><img src="./2.jpg" alt="Ảnh 2"></div>
+                <div class="slide"><img src="./3.jpg" alt="Ảnh 3"></div>
+                <div class="slide"><img src="./4.jpg" alt="Ảnh 4"></div>
+                <div class="slide"><img src="./5.jpg" alt="Ảnh 5"></div>
+                <div class="slide"><img src="./6.jpg" alt="Ảnh 6"></div>
+                <div class="slide"><img src="./7.jpg" alt="Ảnh 7"></div>
+                <div class="slide"><img src="./8.jpg" alt="Ảnh 8"></div>
+                <div class="slide"><img src="./9.jpg" alt="Ảnh 9"></div>
+                <div class="slide"><img src="./10.jpg" alt="Ảnh 10"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="pauseBtn" class="control-btn">Tạm dừng ⏸️</button>
+            <button id="speedBtn" class="control-btn">Tốc độ: Bình thường</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// === Hiển thị lời chúc + mở lightbox ===
+document.getElementById("btn").onclick = function() {
+    document.getElementById("hidden").style.display = "block";
+    openLightbox();
+};
+
+// === Nhạc có hiệu ứng ===
+const musicBtn = document.getElementById("musicBtn");
+const music = document.getElementById("music");
+let isPlaying = false;
+
+musicBtn.onclick = function (e) {
+    if (!isPlaying) {
+        music.volume = 0.7;
+        music.play().catch(() => {
+            // Trên mobile, cần xử lý autoplay policy
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                alert("Để phát nhạc, hãy nhấn giữ nút Phát nhạc hoặc chạm vào màn hình trước khi nhấn.");
+            } else {
+                alert("Trình duyệt đang chặn autoplay — bạn cần nhấn vào file audio.");
+            }
+        });
+        isPlaying = true;
+        musicBtn.classList.add("playing");
+        musicBtn.textContent = "Đang phát 🎵";
+    } else {
+        music.pause();
+        isPlaying = false;
+        musicBtn.classList.remove("playing");
+        musicBtn.textContent = "Phát nhạc 🎵";
+    }
+};
+
+// === Trái tim bay ===
+const hearts = document.getElementById("hearts-container");
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
+    hearts.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+}
+setInterval(createHeart, 400);
+
+// === Pháo hoa background ===
+function createFirework() {
+    const colors = ["#ff3b84","#ffea00","#00f0ff","#ff7f50","#00ff7f","#ff1493","#ffa500"];
+    const particles = 15; // Giảm số particles trên mobile
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight * 0.5;
+
+    for (let i = 0; i < particles; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * 100 + 50; // Giảm distance trên mobile
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+
+        particle.animate([
+            { transform: 'translate(0,0) scale(0)', opacity: 1 },
+            { transform: `translate(${dx}px, ${dy}px) scale(1)`, opacity: 0 }
+        ], {
+            duration: 1200 + Math.random() * 300, // Ngắn hơn trên mobile
+            easing: 'ease-out'
+        });
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1500);
+    }
+}
+
+// Tạo pháo hoa liên tục
+let fireworkInterval = setInterval(createFirework, 600);
+
+// ================= SLIDESHOW TỰ ĐỘNG CHẠY (DÙNG JAVASCRIPT) =================
+const lightbox = document.getElementById('lightbox');
+const slidesTrack = document.getElementById('slidesTrack');
+const pauseBtn = document.getElementById('pauseBtn');
+const speedBtn = document.getElementById('speedBtn');
+
+let isPaused = false;
+let currentSpeed = 1; // 1 = bình thường, 2 = nhanh, 0.5 = chậm
+let animationId = null;
+let position = 0;
+let baseSpeed = 0.3; // pixels per frame - giảm tốc độ cho mobile
+let actualSpeed = baseSpeed;
+
+// Detect mobile device
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if (isMobile) {
+    baseSpeed = 0.2; // Chậm hơn trên mobile
+    actualSpeed = baseSpeed;
+}
+
+// Clone ảnh để tạo hiệu ứng vô hạn
+function setupInfiniteScroll() {
+    // Lưu ảnh gốc
+    const originalSlides = Array.from(slidesTrack.children);
+    
+    // Clone toàn bộ ảnh gốc và thêm vào cuối
+    originalSlides.forEach(slide => {
+        const clone = slide.cloneNode(true);
+        slidesTrack.appendChild(clone);
+    });
+}
+
+// Hàm animation chính
+function animateSlides() {
+    if (!isPaused) {
+        // Di chuyển slides
+        position -= actualSpeed;
+        
+        // Nếu đã cuộn hết một bộ ảnh, reset về đầu
+        const slideWidth = slidesTrack.children[0].offsetWidth + 12; // 12 là gap
+        const totalOriginalSlides = slidesTrack.children.length / 2;
+        
+        if (Math.abs(position) >= slideWidth * totalOriginalSlides) {
+            position = 0;
+        }
+        
+        slidesTrack.style.transform = `translateX(${position}px)`;
+    }
+    
+    animationId = requestAnimationFrame(animateSlides);
+}
+
+// Điều khiển tốc độ
+function setAnimationSpeed(speed) {
+    currentSpeed = speed;
+    actualSpeed = baseSpeed * speed;
+    
+    // Cập nhật text nút bấm
+    let speedText = "Bình thường";
+    if (speed === 2) speedText = "Nhanh";
+    if (speed === 0.5) speedText = "Chậm";
+    speedBtn.textContent = `Tốc độ: ${speedText}`;
+}
+
+// Xử lý nút tạm dừng
+pauseBtn.addEventListener('click', () => {
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+        pauseBtn.textContent = 'Tiếp tục ▶️';
+    } else {
+        pauseBtn.textContent = 'Tạm dừng ⏸️';
+    }
+});
+
+// Xử lý nút tốc độ
+speedBtn.addEventListener('click', () => {
+    // Chuyển đổi giữa các tốc độ
+    if (currentSpeed === 1) {
+        setAnimationSpeed(2); // Nhanh
+    } else if (currentSpeed === 2) {
+        setAnimationSpeed(0.5); // Chậm
+    } else {
+        setAnimationSpeed(1); // Bình thường
+    }
+});
+
+// Open lightbox
+function openLightbox() { 
+    lightbox.style.display = 'flex'; 
+    lightbox.setAttribute('aria-hidden', 'false');
+    
+    // Reset vị trí khi mở
+    position = 0;
+    slidesTrack.style.transform = `translateX(0px)`;
+    
+    // Khởi động animation nếu chưa có
+    if (!animationId) {
+        animateSlides();
+    }
+    
+    // Tạm dừng pháo hoa khi mở lightbox
+    clearInterval(fireworkInterval);
+}
+
+// Close lightbox
+document.getElementById('closeLightbox').onclick = () => { 
+    closeLightbox();
+};
+
+function closeLightbox() {
+    lightbox.style.display = 'none'; 
+    lightbox.setAttribute('aria-hidden', 'true');
+    isPaused = false;
+    pauseBtn.textContent = 'Tạm dừng ⏸️';
+    
+    // Dừng animation khi đóng để tiết kiệm tài nguyên
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    
+    // Khởi động lại pháo hoa
+    clearInterval(fireworkInterval);
+    fireworkInterval = setInterval(createFirework, 600);
+}
+
+// Đóng khi click bên ngoài
+lightbox.addEventListener('click', (e) => { 
+    if(e.target === lightbox) {
+        closeLightbox();
+    }
+});
+
+// Keyboard controls (chỉ trên desktop)
+document.addEventListener('keydown', (e) => {
+    if (lightbox.style.display !== 'flex') return;
+    
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+    
+    // Space để pause/play
+    if (e.key === ' ' && !isMobile) {
+        e.preventDefault();
+        pauseBtn.click();
+    }
+});
+
+// Xử lý touch events cho mobile
+let touchStartX = 0;
+let touchStartY = 0;
+
+lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+});
+
+lightbox.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = Math.abs(touchEndX - touchStartX);
+    const diffY = Math.abs(touchEndY - touchStartY);
+    
+    // Nếu vuốt ngang nhẹ thì không đóng, nếu vuốt dọc mạnh hoặc vuốt ngang mạnh thì đóng
+    if (diffX < 50 && diffY > 80) {
+        // Vuốt dọc mạnh - đóng lightbox
+        closeLightbox();
+    }
+});
+
+// Khởi tạo slideshow
+setupInfiniteScroll();
+setAnimationSpeed(1);
+
+// Bắt đầu animation ngay từ đầu
+animateSlides();
+
+// Optimize cho mobile: giảm số lượng animation khi không cần thiết
+let isLightboxOpen = false;
+
+// Pause animation khi đang không hiển thị
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting && animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        } else if (entry.isIntersecting && !animationId && isLightboxOpen) {
+            animateSlides();
+        }
+    });
+}, {
+    threshold: 0.1
+});
+
+observer.observe(lightbox);
+
+// Thêm sự kiện resize để điều chỉnh responsive
+window.addEventListener('resize', () => {
+    // Reset position để tránh lỗi khi resize
+    position = 0;
+    slidesTrack.style.transform = `translateX(0px)`;
+});
+
+// Thêm hiệu ứng cho nút bấm trên mobile
+const buttons = document.querySelectorAll('button');
+buttons.forEach(button => {
+    button.addEventListener('touchstart', function() {
+        this.style.opacity = '0.7';
+    });
+    
+    button.addEventListener('touchend', function() {
+        this.style.opacity = '1';
+    });
+});
+</script>
+
+</body>
+</html>
